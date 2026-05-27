@@ -107,6 +107,10 @@ function App() {
   useEffect(() => {
     if (!isLoaded) return;
 
+    // Disable snapping on touch devices to prevent scroll locks or freezing issues
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+    if (isTouchDevice) return;
+
     // Setup global snap for pinned sections
     const setupGlobalSnap = () => {
       const pinned = ScrollTrigger.getAll()

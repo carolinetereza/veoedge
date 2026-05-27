@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -30,7 +30,16 @@ export default function PinnedSection({
   const captionRef = useRef<HTMLSpanElement>(null);
   const hairlineRef = useRef<HTMLDivElement>(null);
 
+  const [isTouch, setIsTouch] = useState(false);
+
   useEffect(() => {
+    // Detect touch device
+    setIsTouch(window.matchMedia('(pointer: coarse)').matches);
+  }, []);
+
+  useEffect(() => {
+    if (isTouch) return;
+
     const section = sectionRef.current;
     const imageEl = imageRef.current;
     const panel = panelRef.current;
@@ -173,21 +182,21 @@ export default function PinnedSection({
     }, section);
 
     return () => ctx.revert();
-  }, [isFullBleed]);
+  }, [isFullBleed, isTouch]);
 
   if (isFullBleed) {
     return (
       <section
         ref={sectionRef}
         id={id}
-        className="section-pinned"
-        style={{ zIndex }}
+        className={isTouch ? "relative w-full min-h-[60vh] py-24 bg-veo-dark flex items-center justify-center text-center" : "section-pinned"}
+        style={isTouch ? {} : { zIndex }}
       >
         {/* Full-bleed background image */}
         <div
           ref={imageRef}
           className="absolute inset-0 w-full h-full"
-          style={{ opacity: 0 }}
+          style={{ opacity: isTouch ? 0.3 : 0 }}
         >
           <img
             src={image}
@@ -195,14 +204,14 @@ export default function PinnedSection({
             className="w-full h-full object-cover"
           />
           {/* Dark gradient overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-veo-dark via-veo-dark/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-veo-dark via-veo-dark/60 to-veo-dark" />
         </div>
 
         {/* Top-right caption */}
         <span
           ref={captionRef}
-          className="absolute top-[10vh] right-[8vw] font-mono text-xs text-veo-muted"
-          style={{ opacity: 0 }}
+          className={isTouch ? "absolute top-6 right-6 font-mono text-xs text-veo-muted" : "absolute top-[10vh] right-[8vw] font-mono text-xs text-veo-muted"}
+          style={{ opacity: isTouch ? 1 : 0 }}
         >
           {microCaption}
         </span>
@@ -210,13 +219,13 @@ export default function PinnedSection({
         {/* Bottom-left text block */}
         <div
           ref={textRef}
-          className="absolute bottom-[16vh] left-[8vw] max-w-xl"
-          style={{ opacity: 0 }}
+          className={isTouch ? "relative px-6 max-w-xl z-10" : "absolute bottom-[16vh] left-[8vw] max-w-xl"}
+          style={{ opacity: isTouch ? 1 : 0 }}
         >
           <span className="font-mono text-xs text-veo-muted mb-4 block">
             {eyebrow}
           </span>
-          <h2 className="font-display text-display-2 text-veo-light">
+          <h2 className="font-display text-display-3 sm:text-display-2 text-veo-light">
             {headline}
           </h2>
         </div>
@@ -228,15 +237,15 @@ export default function PinnedSection({
     <section
       ref={sectionRef}
       id={id}
-      className="section-pinned bg-veo-dark"
-      style={{ zIndex }}
+      className={isTouch ? "relative w-full bg-veo-dark" : "section-pinned bg-veo-dark"}
+      style={isTouch ? {} : { zIndex }}
     >
       <div className="flex flex-col lg:flex-row h-full">
         {/* Left Image */}
         <div
           ref={imageRef}
-          className="relative w-full lg:w-1/2 h-[50vh] lg:h-full"
-          style={{ opacity: 0 }}
+          className={isTouch ? "relative w-full h-[40vh]" : "relative w-full lg:w-1/2 h-[50vh] lg:h-full"}
+          style={{ opacity: isTouch ? 1 : 0 }}
         >
           <img
             src={image}
@@ -251,14 +260,14 @@ export default function PinnedSection({
         {/* Right Panel */}
         <div
           ref={panelRef}
-          className="relative w-full lg:w-1/2 h-[50vh] lg:h-full bg-veo-dark flex items-center"
-          style={{ opacity: 0 }}
+          className={isTouch ? "relative w-full py-16 bg-veo-dark flex items-center" : "relative w-full lg:w-1/2 h-[50vh] lg:h-full bg-veo-dark flex items-center"}
+          style={{ opacity: isTouch ? 1 : 0 }}
         >
           {/* Micro caption */}
           <span
             ref={captionRef}
-            className="absolute top-[14vh] left-[8vw] lg:left-[8vw] font-mono text-xs text-veo-muted"
-            style={{ opacity: 0 }}
+            className={isTouch ? "absolute top-6 left-6 font-mono text-xs text-veo-muted" : "absolute top-[14vh] left-[8vw] lg:left-[8vw] font-mono text-xs text-veo-muted"}
+            style={{ opacity: isTouch ? 1 : 0 }}
           >
             {microCaption}
           </span>
@@ -266,8 +275,8 @@ export default function PinnedSection({
           {/* Text content */}
           <div
             ref={textRef}
-            className="px-6 lg:px-[8vw] pt-16 lg:pt-0"
-            style={{ opacity: 0 }}
+            className="px-6 lg:px-[8vw] pt-6 lg:pt-0"
+            style={{ opacity: isTouch ? 1 : 0 }}
           >
             <span className="font-mono text-xs text-veo-muted mb-4 block">
               {eyebrow}
