@@ -129,6 +129,15 @@ function App() {
       ScrollTrigger.create({
         snap: {
           snapTo: (value: number) => {
+            const firstRange = pinnedRanges[0];
+            const lastRange = pinnedRanges[pinnedRanges.length - 1];
+            if (!firstRange || !lastRange) return value;
+
+            // If we are before the first pinned section or after the last pinned section, do not snap!
+            if (value < firstRange.start || value > lastRange.end) {
+              return value;
+            }
+
             const inPinned = pinnedRanges.some(
               r => value >= r.start - 0.02 && value <= r.end + 0.02
             );
